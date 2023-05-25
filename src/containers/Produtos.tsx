@@ -1,39 +1,28 @@
 import { Produto as ProdutoType } from '../App'
+
+import { useGetProductsQuery } from '../services/ebac_products'
+
 import Produto from '../components/Produto'
 
 import * as S from './styles'
 
-type Props = {
-  produtos: ProdutoType[]
-  favoritos: ProdutoType[]
-  adicionarAoCarrinho: (produto: ProdutoType) => void
-  favoritar: (produto: ProdutoType) => void
-}
+const ProdutosComponent = () => {
+  const { data: products, isLoading } = useGetProductsQuery()
 
-const ProdutosComponent = ({
-  produtos,
-  favoritos,
-  adicionarAoCarrinho,
-  favoritar
-}: Props) => {
-  const produtoEstaNosFavoritos = (produto: ProdutoType) => {
-    const produtoId = produto.id
-    const IdsDosFavoritos = favoritos.map((f) => f.id)
-
-    return IdsDosFavoritos.includes(produtoId)
+  if (isLoading) {
+    return (
+      <img
+        className="loading-gif"
+        src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif"
+      />
+    )
   }
 
   return (
     <>
       <S.Produtos>
-        {produtos.map((produto) => (
-          <Produto
-            estaNosFavoritos={produtoEstaNosFavoritos(produto)}
-            key={produto.id}
-            produto={produto}
-            favoritar={favoritar}
-            aoComprar={adicionarAoCarrinho}
-          />
+        {products?.map((produto: ProdutoType) => (
+          <Produto key={produto.id} produto={produto} />
         ))}
       </S.Produtos>
     </>
