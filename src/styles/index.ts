@@ -31,4 +31,8 @@ export const GlobalStyle = createGlobalStyle`
       max-width: 80%;
     }
   }
+
+  .loading-gif {
+    width: 100%
+  }
 `
