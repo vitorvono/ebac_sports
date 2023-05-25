@@ -1,11 +1,15 @@
+import { useDispatch, useSelector } from 'react-redux'
+
+import { RootReducer } from '../../store'
+import { adicionar } from '../../store/reducers/carrinho'
+import { toggleFav } from '../../store/reducers/favoritos'
+
 import { Produto as ProdutoType } from '../../App'
+
 import * as S from './styles'
 
 type Props = {
   produto: ProdutoType
-  aoComprar: (produto: ProdutoType) => void
-  favoritar: (produto: ProdutoType) => void
-  estaNosFavoritos: boolean
 }
 
 export const paraReal = (valor: number) =>
@@ -13,27 +17,33 @@ export const paraReal = (valor: number) =>
     valor
   )
 
-const ProdutoComponent = ({
-  produto,
-  aoComprar,
-  favoritar,
-  estaNosFavoritos
-}: Props) => {
+const ProdutoComponent = ({ produto }: Props) => {
+  const dispatch = useDispatch()
+
+  const favoritos = useSelector((state: RootReducer) => state.favoritos.favs)
+  const { imagem, nome, preco } = produto
+
+  const produtoEstaNosFavoritos = (produto: ProdutoType) => {
+    const produtoId = produto.id
+    const IdsDosFavoritos = favoritos.map((f) => f.id)
+    return IdsDosFavoritos.includes(produtoId)
+  }
+
   return (
     <S.Produto>
       <S.Capa>
-        <img src={produto.imagem} alt={produto.nome} />
+        <img src={imagem} alt={nome} />
       </S.Capa>
-      <S.Titulo>{produto.nome}</S.Titulo>
+      <S.Titulo>{nome}</S.Titulo>
       <S.Prices>
-        <strong>{paraReal(produto.preco)}</strong>
+        <strong>{paraReal(preco)}</strong>
       </S.Prices>
-      <S.BtnComprar onClick={() => favoritar(produto)} type="button">
-        {estaNosFavoritos
+      <S.BtnComprar onClick={() => dispatch(toggleFav(produto))} type="button">
+        {produtoEstaNosFavoritos(produto)
           ? '- Remover dos favoritos'
           : '+ Adicionar aos favoritos'}
       </S.BtnComprar>
-      <S.BtnComprar onClick={() => aoComprar(produto)} type="button">
+      <S.BtnComprar onClick={() => dispatch(adicionar(produto))} type="button">
         Adicionar ao carrinho
       </S.BtnComprar>
     </S.Produto>
